@@ -7,8 +7,23 @@
     <link rel="stylesheet" href="styles.css">
 </head>
 <body>
-    <h1>안녕하세요</h1>
+    <h1>환영합니다</h1>
     <p>제 첫 웹페이지입니다.</p>
+    <button onclick="buttonClick()">클릭하세요</button>
+    <p>오늘의 방문자 수: <span id="visitor-count">0</span></p>
+    <script>
+        function buttonClick() {
+            console.log('버튼이 클릭되었습니다!');
+        }
+        
+        function updateVisitorCount() {
+            let count = localStorage.getItem('visitorCount') || 0;
+            count++;
+            localStorage.setItem('visitorCount', count);
+            document.getElementById('visitor-count').innerText = count;
+        }
+        updateVisitorCount();
+    </script>
     <script src="scripts.js"></script>
 </body>
 </html>

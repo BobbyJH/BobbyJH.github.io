@@ -1,1 +1,3 @@
-console.log('웹사이트가 로드되었습니다!');
+function buttonClick() {
+    console.log('버튼이 클릭되었습니다!');
+}
