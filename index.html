@@ -5,45 +5,52 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>나의 웹사이트</title>
     <link rel="stylesheet" href="styles.css">
+    
     <!-- Firebase SDK 추가 -->
-    <script src="https://www.gstatic.com/firebasejs/9.x.x/firebase-app.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/9.x.x/firebase-database.js"></script>
-</head>
-<body>
-    <h1>환영합니다</h1>
-    <p>제 첫 웹페이지입니다.</p>
-    <p>전체 방문자 수: <span id="visitor-count">0</span></p>
+    <script type="module">
+        // Firebase 앱 SDK 임포트
+        import { initializeApp } from 'https://www.gstatic.com/firebasejs/9.x.x/firebase-app.js';
+        import { getDatabase, ref, onValue, increment, set } from 'https://www.gstatic.com/firebasejs/9.x.x/firebase-database.js';
 
-    <script>
-        // Firebase 구성
+        // Firebase 구성 정보
         const firebaseConfig = {
-        apiKey: "AIzaSyCeuv_q_BZVLJGXO6vLIPqssKo21xP0b3s",
-        authDomain: "bobbyjh-e6583.firebaseapp.com",
-        projectId: "bobbyjh-e6583",
-        storageBucket: "bobbyjh-e6583.firebasestorage.app",
-        messagingSenderId: "13018745601",
-        appId: "1:13018745601:web:e60532b2bc64845fd2e900",
-        measurementId: "G-GL1MEPRZF0"
+            apiKey: "AIzaSyCeuv_q_BZVLJGXO6vLIPqssKo21xP0b3s",
+            authDomain: "bobbyjh-e6583.firebaseapp.com",
+            projectId: "bobbyjh-e6583",
+            storageBucket: "bobbyjh-e6583.firebasestorage.app",
+            messagingSenderId: "13018745601",
+            appId: "1:13018745601:web:e60532b2bc64845fd2e900",
+            measurementId: "G-GL1MEPRZF0"
         };
 
         // Firebase 초기화
-        firebase.initializeApp(firebaseConfig);
-        const database = firebase.database();
+        const app = initializeApp(firebaseConfig);
+        const database = getDatabase(app);
+        const visitorCountRef = ref(database, 'visitorCount');
 
-        // 방문자 수 업데이트
+        // 방문자 수 업데이트 함수
         function updateVisitorCount() {
-            const visitorRef = database.ref('visitors');
-            visitorRef.transaction((currentCount) => {
-                return (currentCount || 0) + 1;
-            });
-
-            // 방문자 수 표시
-            visitorRef.on('value', (snapshot) => {
-                document.getElementById('visitor-count').innerText = snapshot.val();
+            onValue(visitorCountRef, (snapshot) => {
+                let count = snapshot.val() || 0;
+                count++;
+                set(visitorCountRef, count);
+                document.getElementById('visitor-count').textContent = count;
+            }, {
+                onlyOnce: true
             });
         }
 
-        updateVisitorCount();
+        // 페이지 로드 시 방문자 수 업데이트
+        window.onload = updateVisitorCount;
     </script>
+</head>
+<body>
+    <main>
+        <h1>환영합니다</h1>
+        <p>제 첫 웹페이지입니다.</p>
+        <div class="visitor-counter">
+            <p>총 방문자 수: <span id="visitor-count">0</span>명</p>
+        </div>
+    </main>
 </body>
 </html>
