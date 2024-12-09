@@ -5,11 +5,21 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>나의 웹사이트</title>
     <link rel="stylesheet" href="styles.css">
-    
-    <!-- Firebase SDK 추가 -->
+</head>
+<body>
+    <main>
+        <h1>환영합니다</h1>
+        <p>제 첫 웹페이지입니다.</p>
+        <div class="visitor-counter">
+            <p>총 방문자 수: <span id="visitor-count">0</span>명</p>
+        </div>
+    </main>
+
     <script type="module">
-        import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.10.0/firebase-app.js';
-        import { getDatabase } from 'https://www.gstatic.com/firebasejs/10.10.0/firebase-database.js';
+        // Firebase SDK 임포트
+        import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js';
+        import { getDatabase, ref, get, set } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js';
+
         // Firebase 구성 정보
         const firebaseConfig = {
             apiKey: "AIzaSyCmKHVd8cd2N3LA_HRLUQVtsxFc-4s-LcY",
@@ -27,28 +37,21 @@
         const visitorCountRef = ref(database, 'visitorCount');
 
         // 방문자 수 업데이트 함수
-        function updateVisitorCount() {
-            onValue(visitorCountRef, (snapshot) => {
-                let count = snapshot.val() || 0;
+        async function updateVisitorCount() {
+            try {
+                const snapshot = await get(visitorCountRef);
+                let count = snapshot.exists() ? snapshot.val() : 0;
                 count++;
-                set(visitorCountRef, count);
+                
+                await set(visitorCountRef, count);
                 document.getElementById('visitor-count').textContent = count;
-            }, {
-                onlyOnce: true
-            });
+            } catch (error) {
+                console.error('Error updating visitor count:', error);
+            }
         }
 
         // 페이지 로드 시 방문자 수 업데이트
-        window.onload = updateVisitorCount;
+        updateVisitorCount();
     </script>
-</head>
-<body>
-    <main>
-        <h1>환영합니다</h1>
-        <p>제 첫 웹페이지입니다.</p>
-        <div class="visitor-counter">
-            <p>총 방문자 수: <span id="visitor-count">0</span>명</p>
-        </div>
-    </main>
 </body>
 </html>
