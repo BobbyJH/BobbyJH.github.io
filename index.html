@@ -13,6 +13,19 @@
         <div class="visitor-counter">
             <p>총 방문자 수: <span id="visitor-count">0</span>명</p>
         </div>
+
+        <!-- 끝말잇기 게임 섹션 추가 -->
+        <div class="word-chain-game">
+            <h2>끝말잇기 게임</h2>
+            <div class="game-input">
+                <input type="text" id="word-input" placeholder="단어를 입력하세요">
+                <button onclick="addWord()">입력</button>
+            </div>
+            <div id="word-list">
+                <h3>입력된 단어들:</h3>
+                <ul id="words"></ul>
+            </div>
+        </div>
     </main>
 
     <script type="module">
@@ -35,6 +48,7 @@
         const app = initializeApp(firebaseConfig);
         const database = getDatabase(app);
         const visitorCountRef = ref(database, 'visitorCount');
+        const wordsRef = ref(database, 'words');
 
         // 방문자 수 업데이트 함수
         async function updateVisitorCount() {
@@ -50,8 +64,75 @@
             }
         }
 
-        // 페이지 로드 시 방문자 수 업데이트
+        // 단어 목록 초기화
+        async function initializeWords() {
+            try {
+                const snapshot = await get(wordsRef);
+                if (snapshot.exists()) {
+                    words = snapshot.val();
+                    updateWordList();
+                }
+            } catch (error) {
+                console.error('Error initializing words:', error);
+            }
+        }
+
+        // Firebase 초기화 후 실행
         updateVisitorCount();
+        initializeWords();
+
+        // 전역 함수로 만들어 HTML에서 접근 가능하게 함
+        window.addWord = async function() {
+            const input = document.getElementById('word-input');
+            const word = input.value.trim();
+
+            if (word) {
+                if (isValidWord(word)) {
+                    words.push(word);
+                    try {
+                        await set(wordsRef, words);
+                        updateWordList();
+                        input.value = '';
+                    } catch (error) {
+                        console.error('Error saving word:', error);
+                    }
+                } else {
+                    alert('끝말잇기 규칙에 맞지 않는 단어입니다!');
+                }
+            }
+        };
+    </script>
+
+    <script>
+        // 끝말잇기 게임 관련 변수와 함수
+        let words = [];
+
+        function isValidWord(word) {
+            if (words.length === 0) {
+                return true;
+            }
+            const lastWord = words[words.length - 1];
+            const lastChar = lastWord[lastWord.length - 1];
+            const firstChar = word[0];
+            return lastChar === firstChar;
+        }
+
+        function updateWordList() {
+            const wordList = document.getElementById('words');
+            wordList.innerHTML = '';
+            words.forEach((word) => {
+                const li = document.createElement('li');
+                li.textContent = word;
+                wordList.appendChild(li);
+            });
+        }
+
+        // Enter 키로 단어 입력
+        document.getElementById('word-input').addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                window.addWord();
+            }
+        });
     </script>
 </body>
 </html>
