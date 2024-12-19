@@ -8,3 +8,43 @@ body {
 h1 {
     color: #333;
 }
+
+/* 끝말잇기 섹션 스타일 */
+.word-chain {
+    margin-bottom: 40px;
+    padding: 20px;
+    background: white;
+    border-radius: 8px;
+}
+
+/* 갤러리 스타일 */
+.gallery {
+    max-width: 1200px;
+    margin: 0 auto;
+}
+
+.gallery-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    gap: 20px;
+    padding: 20px;
+}
+
+.gallery-item {
+    background: white;
+    padding: 10px;
+    border-radius: 8px;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+}
+
+.gallery-item img {
+    width: 100%;
+    height: auto;
+    border-radius: 4px;
+}
+
+.caption {
+    text-align: center;
+    margin-top: 10px;
+    color: #333;
+}

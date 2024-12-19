@@ -1,138 +1,35 @@
 <!DOCTYPE html>
-<html lang="ko">
+<html>
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>나의 웹사이트</title>
+    <title>나의 아트 갤러리</title>
     <link rel="stylesheet" href="styles.css">
 </head>
 <body>
-    <main>
-        <h1>환영합니다</h1>
-        <p>제 첫 웹페이지입니다.</p>
-        <div class="visitor-counter">
-            <p>총 방문자 수: <span id="visitor-count">0</span>명</p>
-        </div>
+    <header>
+        <h1>환영합니다 제 첫 웹페이지입니다.</h1>
+        <p>총 방문자 수: <span id="visitorCount">0</span>명</p>
+    </header>
 
-        <!-- 끝말잇기 게임 섹션 추가 -->
-        <div class="word-chain-game">
-            <h2>끝말잇기 게임</h2>
-            <div class="game-input">
-                <input type="text" id="word-input" placeholder="단어를 입력하세요">
-                <button onclick="addWord()">입력</button>
+    <!-- 기존 끝말잇기 섹션 -->
+    <section class="word-chain">
+        <h2>끝말잇기 게임</h2>
+        <input type="text" id="wordInput">
+        <button onclick="submitWord()">입력</button>
+        <p>입력된 단어들:</p>
+        <div id="wordList"></div>
+    </section>
+
+    <!-- 새로운 갤러리 섹션 -->
+    <main class="gallery">
+        <h2>나의 작품들</h2>
+        <div class="gallery-grid">
+            <div class="gallery-item">
+                <img src="./images/artwork1.jpg" alt="작품 1">
+                <p class="caption">작품 제목 1</p>
             </div>
-            <div id="word-list">
-                <h3>입력된 단어들:</h3>
-                <ul id="words"></ul>
-            </div>
+            <!-- 추가 작품들은 같은 형식으로 반복 -->
         </div>
     </main>
-
-    <script type="module">
-        // Firebase SDK 임포트
-        import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js';
-        import { getDatabase, ref, get, set } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js';
-
-        // Firebase 구성 정보
-        const firebaseConfig = {
-            apiKey: "AIzaSyCmKHVd8cd2N3LA_HRLUQVtsxFc-4s-LcY",
-            authDomain: "reco-2e3bb.firebaseapp.com",
-            projectId: "reco-2e3bb",
-            storageBucket: "reco-2e3bb.firebasestorage.app",
-            messagingSenderId: "457666532666",
-            appId: "1:457666532666:web:8c1c9694e2ab952cb56c03",
-            measurementId: "G-4YJMLVFD17"
-        };
-
-        // Firebase 초기화
-        const app = initializeApp(firebaseConfig);
-        const database = getDatabase(app);
-        const visitorCountRef = ref(database, 'visitorCount');
-        const wordsRef = ref(database, 'words');
-
-        // 방문자 수 업데이트 함수
-        async function updateVisitorCount() {
-            try {
-                const snapshot = await get(visitorCountRef);
-                let count = snapshot.exists() ? snapshot.val() : 0;
-                count++;
-                
-                await set(visitorCountRef, count);
-                document.getElementById('visitor-count').textContent = count;
-            } catch (error) {
-                console.error('Error updating visitor count:', error);
-            }
-        }
-
-        // 단어 목록 초기화
-        async function initializeWords() {
-            try {
-                const snapshot = await get(wordsRef);
-                if (snapshot.exists()) {
-                    words = snapshot.val();
-                    updateWordList();
-                }
-            } catch (error) {
-                console.error('Error initializing words:', error);
-            }
-        }
-
-        // Firebase 초기화 후 실행
-        updateVisitorCount();
-        initializeWords();
-
-        // 전역 함수로 만들어 HTML에서 접근 가능하게 함
-        window.addWord = async function() {
-            const input = document.getElementById('word-input');
-            const word = input.value.trim();
-
-            if (word) {
-                if (isValidWord(word)) {
-                    words.push(word);
-                    try {
-                        await set(wordsRef, words);
-                        updateWordList();
-                        input.value = '';
-                    } catch (error) {
-                        console.error('Error saving word:', error);
-                    }
-                } else {
-                    alert('끝말잇기 규칙에 맞지 않는 단어입니다!');
-                }
-            }
-        };
-    </script>
-
-    <script>
-        // 끝말잇기 게임 관련 변수와 함수
-        let words = [];
-
-        function isValidWord(word) {
-            if (words.length === 0) {
-                return true;
-            }
-            const lastWord = words[words.length - 1];
-            const lastChar = lastWord[lastWord.length - 1];
-            const firstChar = word[0];
-            return lastChar === firstChar;
-        }
-
-        function updateWordList() {
-            const wordList = document.getElementById('words');
-            wordList.innerHTML = '';
-            words.forEach((word) => {
-                const li = document.createElement('li');
-                li.textContent = word;
-                wordList.appendChild(li);
-            });
-        }
-
-        // Enter 키로 단어 입력
-        document.getElementById('word-input').addEventListener('keypress', function(e) {
-            if (e.key === 'Enter') {
-                window.addWord();
-            }
-        });
-    </script>
+    <script src="scripts.js"></script>
 </body>
 </html>
